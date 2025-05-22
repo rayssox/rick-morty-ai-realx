@@ -1,3 +1,7 @@
+import os
+
+replicate_token = os.getenv("REPLICATE_API_TOKEN")
+
 import gradio as gr
 import replicate
 import requests
