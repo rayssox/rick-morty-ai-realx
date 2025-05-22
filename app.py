@@ -10,16 +10,33 @@ import os
 replicate_token = os.environ.get("REPLICATE_API_TOKEN")
 
 def rick_and_morty_convert(image):
+    if image is None:
+        return "Hata: Görsel yüklenemedi."
+
     # Save input image temporarily
     image.save("input.png")
 
     # Upload to a temporary image host (Replicate requires URL input)
     imgur_response = requests.post(
         "https://api.imgbb.com/1/upload",
-        params={"key": "r8_EeewhYnIxeBgF6NbnmbxbwZK6hWrTod1enCMT"},
+        params={"key": "r8_EeewhYnIxeBpf6Nbmbxbw7K6hWrTod1enCMT"},
         files={"image": open("input.png", "rb")}
     )
-    image_url = imgur_response.json()["data"]["url"]
+
+    response_json = imgur_response.json()
+
+    if response_json.get("success") and "data" in response_json and "link" in response_json["data"]:
+        image_url = response_json["data"]["link"]
+    else:
+        print("Imgur API hata mesajı:", response_json)
+        return "Imgur hatası: Görsel yüklenemedi."
+return image_url
+
+    # AI dönüşüm kodların buradan sonra gelir
+
+
+  
+
 
     # Call Replicate API
     client = replicate.Client(api_token=replicate_token)
