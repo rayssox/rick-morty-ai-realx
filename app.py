@@ -19,7 +19,14 @@ def rick_and_morty_convert(image):
         params={"key": "r8_EeewhYnIxeBgF6NbnmbxbwZK6hWrTod1enCMT"},
         files={"image": open("input.png", "rb")}
     )
-    image_url = imgur_response.json()["data"]["url"]
+    response_json = imgur_response.json()
+
+if response_json.get("success") and "data" in response_json and "link" in response_json["data"]:
+    image_url = response_json["data"]["link"]
+else:
+    print("Imgur API hata mesajı:", response_json)
+    return "Imgur hatası: Görsel yüklenemedi."
+
 
     # Call Replicate API
     client = replicate.Client(api_token=replicate_token)
