@@ -2,10 +2,9 @@ import gradio as gr
 import replicate
 import os
 
-# Replicate API token (gizli tutmalısın!)
+# Token
 os.environ["REPLICATE_API_TOKEN"] = "r8_f312U5UTkUhnVDi2Kjz8rqiggIuazQq0mbiNc"
 
-# Kullanılacak model (anime tarzı, test edildi ve public)
 MODEL = "fofr/anything-v4.0"
 
 def generate_anime_style(image):
@@ -31,5 +30,6 @@ with gr.Blocks() as demo:
 
     button.click(fn=generate_anime_style, inputs=[image], outputs=[output])
 
+# Burada açık port belirtiliyor!
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(server_name="0.0.0.0", server_port=10000)
