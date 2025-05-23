@@ -1,38 +1,32 @@
 import gradio as gr
 import replicate
 import os
-from PIL import Image
 
-# Replicate API token'ı ortam değişkeninden al
-replicate_token = os.getenv("REPLICATE_API_TOKEN")
-client = replicate.Client(api_token=replicate_token)
+# API Token – Güvenli kullanım için çevresel değişkenle çalışalım
+os.environ["REPLICATE_API_TOKEN"] = "r8_f312U5UTkUhnVDi2Kjz8rqiggIuazQq0mbiNc"
 
-# Dönüştürme fonksiyonu
-def rick_and_morty_convert(image):
-    if image is None:
-        return "Lütfen bir görsel yükleyin."
-
-    # Görseli geçici dosya olarak kaydet
-    image_path = "input.png"
-    image.save(image_path)
-
-    # Replicate API çağrısı
-    output_url = client.run(
-        "fofr/anything-to-rick-and-morty:cc8db15b6ec0fb1b8423798f35e3e62f0bb1a76a6e62edc8347c8cf5be3c77f6",
-        input={"image": open(image_path, "rb")}
+def generate(image, style):
+    output = replicate.run(
+        "lucataco/anything-to-anything:06a6ad3cb0b70679cf85303fd26368c7d9bc65eb960e5cdbb8c55a6c3df01565",
+        input={
+            "image": open(image, "rb"),
+            "prompt": style
+        }
     )
-
-    return output_url
+    return output
 
 # Arayüz
-iface = gr.Interface(
-    fn=rick_and_morty_convert,
-    inputs=gr.Image(type="pil"),
-    outputs=gr.Image(type="filepath"),
-    title="Rick and Morty Avatar Generator",
-    description="Fotoğrafını yükle, Rick and Morty karakterine dönüşsün!"
-)
+with gr.Blocks() as demo:
+    gr.Markdown("## 📸 Fotoğrafını yükle, çizgi stile dönüştür!")
+    with gr.Row():
+        with gr.Column():
+            style = gr.Textbox(label="Stil (örnek: Rick and Morty, Marvel, Naruto...)")
+            image = gr.Image(type="filepath", label="Fotoğraf Yükle")
+            btn = gr.Button("Dönüştür")
+        with gr.Column():
+            output = gr.Image(label="Çizilmiş Görsel")
 
-# Başlat
+    btn.click(fn=generate, inputs=[image, style], outputs=output)
+
 if __name__ == "__main__":
-    iface.launch(server_name="0.0.0.0", server_port=8080)
+    demo.launch()
