@@ -2,31 +2,31 @@ import gradio as gr
 import replicate
 import os
 
-# API Token – Güvenli kullanım için çevresel değişkenle çalışalım
+# Replicate API token
 os.environ["REPLICATE_API_TOKEN"] = "r8_f312U5UTkUhnVDi2Kjz8rqiggIuazQq0mbiNc"
 
-def generate(image, style):
+def generate_anime_style(image):
     output = replicate.run(
-        "lucataco/anything-to-anything:06a6ad3cb0b70679cf85303fd26368c7d9bc65eb960e5cdbb8c55a6c3df01565",
+        "tstramer/anime-art-diffusion:7d702670ae67e64794c8096fd9d64892e6d82de61a37a97f5b4512e2f220f264",
         input={
-            "image": open(image, "rb"),
-            "prompt": style
+            "image": image,
+            "prompt": "anime style",
+            "guidance_scale": 7.5,
+            "num_inference_steps": 30
         }
     )
     return output
 
-# Arayüz
 with gr.Blocks() as demo:
-    gr.Markdown("## 📸 Fotoğrafını yükle, çizgi stile dönüştür!")
+    gr.Markdown("## Anime Stilinde Çizim Oluştur")
     with gr.Row():
         with gr.Column():
-            style = gr.Textbox(label="Stil (örnek: Rick and Morty, Marvel, Naruto...)")
-            image = gr.Image(type="filepath", label="Fotoğraf Yükle")
-            btn = gr.Button("Dönüştür")
+            input_image = gr.Image(type="filepath", label="Bir fotoğraf yükleyin")
+            generate_button = gr.Button("Anime'ye Dönüştür")
         with gr.Column():
-            output = gr.Image(label="Çizilmiş Görsel")
+            output_image = gr.Image(label="Anime Çizimi")
 
-    btn.click(fn=generate, inputs=[image, style], outputs=output)
+    generate_button.click(fn=generate_anime_style, inputs=[input_image], outputs=[output_image])
 
 if __name__ == "__main__":
     demo.launch()
